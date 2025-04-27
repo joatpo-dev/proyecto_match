@@ -15,6 +15,8 @@ void main() async {
 }
 
 class MyApp extends StatelessWidget {
+  const MyApp({super.key});
+
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
@@ -23,7 +25,7 @@ class MyApp extends StatelessWidget {
         primarySwatch: Colors.pink,
         colorScheme: ColorScheme.fromSwatch().copyWith(
           secondary: Colors.pink,
-          background: Color.fromRGBO(255, 169, 209, 1.0),
+          surface: Color.fromRGBO(255, 169, 209, 1.0),
         ),
       ),
       home: AuthScreen(),
@@ -38,16 +40,13 @@ class AuthScreen extends StatefulWidget {
 
 class _AuthScreenState extends State<AuthScreen> {
   final _auth = FirebaseAuth.instance;
-  bool _isLoading = false;
   bool _isLogin = true;
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
   final _usernameController = TextEditingController();
 
   Future<void> _authenticate(BuildContext context) async {
-    setState(() {
-      _isLoading = true;
-    });
+    setState(() {});
 
     try {
       if (_isLogin) {
@@ -56,9 +55,7 @@ class _AuthScreenState extends State<AuthScreen> {
         await _signUpWithEmail();
       }
     } finally {
-      setState(() {
-        _isLoading = false;
-      });
+      setState(() {});
     }
   }
 
@@ -70,7 +67,8 @@ class _AuthScreenState extends State<AuthScreen> {
       );
 
       if (userCredential.user != null) {
-        final formularioCompletado = await _isFormularioCompletado(_emailController.text);
+        final formularioCompletado =
+            await _isFormularioCompletado(_emailController.text);
 
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
@@ -93,15 +91,19 @@ class _AuthScreenState extends State<AuthScreen> {
           ),
         );
 
-
         if (formularioCompletado) {
-          await FirebaseFirestore.instance.collection('usuarios').doc(_emailController.text).update({
+          await FirebaseFirestore.instance
+              .collection('usuarios')
+              .doc(_emailController.text)
+              .update({
             'formulario_completado': true,
           });
 
           Navigator.pushReplacement(
             context,
-            MaterialPageRoute(builder: (context) => HomeScreen()), // Cambia PreguntasUsuario() por la página Home
+            MaterialPageRoute(
+                builder: (context) =>
+                    HomeScreen()), // Cambia PreguntasUsuario() por la página Home
           );
         } else {
           Navigator.pushReplacement(
@@ -115,11 +117,12 @@ class _AuthScreenState extends State<AuthScreen> {
     }
   }
 
-
-
   Future<bool> _isFormularioCompletado(String userEmail) async {
     final etiquetas = ['etiqueta1', 'etiqueta2', 'etiqueta3', 'etiqueta4'];
-    final userDoc = await FirebaseFirestore.instance.collection('usuarios').doc(userEmail).get();
+    final userDoc = await FirebaseFirestore.instance
+        .collection('usuarios')
+        .doc(userEmail)
+        .get();
 
     if (!userDoc.exists) {
       print('El usuario no existe');
@@ -147,7 +150,10 @@ class _AuthScreenState extends State<AuthScreen> {
         password: _passwordController.text,
       );
       if (userCredential.user != null) {
-        await FirebaseFirestore.instance.collection('usuarios').doc(_emailController.text).set({
+        await FirebaseFirestore.instance
+            .collection('usuarios')
+            .doc(_emailController.text)
+            .set({
           'nombre': _usernameController.text,
           'mail': _emailController.text,
           'puntos': 150,
@@ -178,8 +184,6 @@ class _AuthScreenState extends State<AuthScreen> {
           },
         );
 
-
-
         Future.delayed(Duration(seconds: 2), () {
           setState(() {
             _isLogin = true;
@@ -201,7 +205,8 @@ class _AuthScreenState extends State<AuthScreen> {
         ),
       );
     } catch (error) {
-      _showErrorDialog('Failed to send reset password. Please check your email address.');
+      _showErrorDialog(
+          'Failed to send reset password. Please check your email address.');
     }
   }
 
@@ -227,7 +232,6 @@ class _AuthScreenState extends State<AuthScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Color.fromRGBO(255, 169, 209, 1.0),
-
       body: Center(
         child: SingleChildScrollView(
           child: Column(
@@ -265,9 +269,12 @@ class _AuthScreenState extends State<AuthScreen> {
                                 });
                               },
                               child: Container(
-                                padding: EdgeInsets.symmetric(vertical: 10, horizontal: 40),
+                                padding: EdgeInsets.symmetric(
+                                    vertical: 10, horizontal: 40),
                                 decoration: BoxDecoration(
-                                  color: _isLogin ? Color.fromRGBO(226, 50, 42, 1): Colors.grey,
+                                  color: _isLogin
+                                      ? Color.fromRGBO(226, 50, 42, 1)
+                                      : Colors.grey,
                                   borderRadius: BorderRadius.only(
                                     topLeft: Radius.circular(40),
                                     bottomLeft: Radius.circular(40),
@@ -275,7 +282,8 @@ class _AuthScreenState extends State<AuthScreen> {
                                 ),
                                 child: Text(
                                   'Log in',
-                                  style: TextStyle(color: Colors.white, fontSize: 18),
+                                  style: TextStyle(
+                                      color: Colors.white, fontSize: 18),
                                 ),
                               ),
                             ),
@@ -286,9 +294,12 @@ class _AuthScreenState extends State<AuthScreen> {
                                 });
                               },
                               child: Container(
-                                padding: EdgeInsets.symmetric(vertical: 10, horizontal: 40),
+                                padding: EdgeInsets.symmetric(
+                                    vertical: 10, horizontal: 40),
                                 decoration: BoxDecoration(
-                                  color: _isLogin ? Colors.grey : Color.fromRGBO(226, 50, 42, 1),
+                                  color: _isLogin
+                                      ? Colors.grey
+                                      : Color.fromRGBO(226, 50, 42, 1),
                                   borderRadius: BorderRadius.only(
                                     topRight: Radius.circular(40),
                                     bottomRight: Radius.circular(40),
@@ -296,7 +307,8 @@ class _AuthScreenState extends State<AuthScreen> {
                                 ),
                                 child: Text(
                                   'Sign Up',
-                                  style: TextStyle(color: Colors.white, fontSize: 18),
+                                  style: TextStyle(
+                                      color: Colors.white, fontSize: 18),
                                 ),
                               ),
                             ),
@@ -306,9 +318,14 @@ class _AuthScreenState extends State<AuthScreen> {
                         Padding(
                           padding: EdgeInsets.only(bottom: 25),
                           child: Text(
-                            _isLogin ? 'Welcome to MATCH!' : 'Welcome to MATCH!',
+                            _isLogin
+                                ? 'Welcome to MATCH!'
+                                : 'Welcome to MATCH!',
                             textAlign: TextAlign.center,
-                            style: TextStyle(color: Colors.black, fontSize: 20, fontWeight: FontWeight.bold),
+                            style: TextStyle(
+                                color: Colors.black,
+                                fontSize: 20,
+                                fontWeight: FontWeight.bold),
                           ),
                         ),
                         SizedBox(height: 1),
@@ -322,7 +339,8 @@ class _AuthScreenState extends State<AuthScreen> {
                                 border: OutlineInputBorder(
                                   borderRadius: BorderRadius.circular(10),
                                 ),
-                                contentPadding: EdgeInsets.symmetric(vertical: 15, horizontal: 20),
+                                contentPadding: EdgeInsets.symmetric(
+                                    vertical: 15, horizontal: 20),
                               ),
                               keyboardType: TextInputType.text,
                             ),
@@ -337,12 +355,13 @@ class _AuthScreenState extends State<AuthScreen> {
                               border: OutlineInputBorder(
                                 borderRadius: BorderRadius.circular(10),
                               ),
-                              contentPadding: EdgeInsets.symmetric(vertical: 15, horizontal: 20),
+                              contentPadding: EdgeInsets.symmetric(
+                                  vertical: 15, horizontal: 20),
                             ),
                             keyboardType: TextInputType.emailAddress,
                           ),
                         ),
-                        SizedBox(height: 20 ),
+                        SizedBox(height: 20),
                         Padding(
                           padding: EdgeInsets.symmetric(horizontal: 10),
                           child: TextField(
@@ -352,7 +371,8 @@ class _AuthScreenState extends State<AuthScreen> {
                               border: OutlineInputBorder(
                                 borderRadius: BorderRadius.circular(10),
                               ),
-                              contentPadding: EdgeInsets.symmetric(vertical: 15, horizontal: 20),
+                              contentPadding: EdgeInsets.symmetric(
+                                  vertical: 15, horizontal: 20),
                             ),
                             obscureText: true,
                           ),
@@ -362,7 +382,7 @@ class _AuthScreenState extends State<AuthScreen> {
                           onPressed: () => _authenticate(context),
                           style: ElevatedButton.styleFrom(
                             textStyle: TextStyle(fontSize: 18),
-                            primary: Color.fromRGBO(226, 50, 42, 1),
+                            backgroundColor: Color.fromRGBO(226, 50, 42, 1),
                             minimumSize: Size(double.infinity, 50),
                             shape: RoundedRectangleBorder(
                               borderRadius: BorderRadius.circular(40),
@@ -381,7 +401,8 @@ class _AuthScreenState extends State<AuthScreen> {
                             onPressed: _resetPassword,
                             child: Text(
                               'Forgot Password?',
-                              style: TextStyle(fontSize: 16, color: Colors.black),
+                              style:
+                                  TextStyle(fontSize: 16, color: Colors.black),
                             ),
                           ),
                       ],
@@ -413,10 +434,8 @@ class UserInfo extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return FutureBuilder<DocumentSnapshot>(
-      future: FirebaseFirestore.instance
-          .collection('usuarios')
-          .doc(email)
-          .get(),
+      future:
+          FirebaseFirestore.instance.collection('usuarios').doc(email).get(),
       builder:
           (BuildContext context, AsyncSnapshot<DocumentSnapshot> snapshot) {
         if (snapshot.connectionState == ConnectionState.waiting) {
@@ -435,7 +454,6 @@ class UserInfo extends StatelessWidget {
         return ListTile(
           title: Text('${userData['nombre']} ${userData['Apellido']}'),
           subtitle: Text(userData['mail']),
-
         );
       },
     );

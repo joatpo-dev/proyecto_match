@@ -7,11 +7,15 @@ import '../components/footer.dart';
 import '../components/header.dart';
 
 class HomeScreen extends StatefulWidget {
+  const HomeScreen({super.key});
+
   @override
+  // ignore: library_private_types_in_public_api
   _HomeScreenState createState() => _HomeScreenState();
 }
 
-class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateMixin {
+class _HomeScreenState extends State<HomeScreen>
+    with SingleTickerProviderStateMixin {
   late TabController _tabController;
   late PageController _pageController;
 
@@ -21,7 +25,6 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
   List<Map<String, dynamic>> postres = [];
   String selectedLabel = '';
   List<String> filtrar = [];
-
 
   @override
   void initState() {
@@ -44,9 +47,13 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
     }
     setState(() {});
   }
+
   Future<List<dynamic>> _getUserFiltrar(User user) async {
     try {
-      DocumentSnapshot snapshot = await FirebaseFirestore.instance.collection('usuarios').doc(user.email).get();
+      DocumentSnapshot snapshot = await FirebaseFirestore.instance
+          .collection('usuarios')
+          .doc(user.email)
+          .get();
       if (snapshot.exists) {
         Map<String, dynamic> data = snapshot.data() as Map<String, dynamic>;
         // Asumiendo que 'filtrar' es un array en Firestore
@@ -60,7 +67,10 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
 
   Future<String> _getUserSelectedLabel(User user) async {
     try {
-      DocumentSnapshot snapshot = await FirebaseFirestore.instance.collection('usuarios').doc(user.email).get();
+      DocumentSnapshot snapshot = await FirebaseFirestore.instance
+          .collection('usuarios')
+          .doc(user.email)
+          .get();
       if (snapshot.exists) {
         Map<String, dynamic> data = snapshot.data() as Map<String, dynamic>;
         return data['etiqueta1'] ?? '';
@@ -70,10 +80,12 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
     }
     return '';
   }
+
   Future<void> _addToFavorites(Map<String, dynamic> foodItem) async {
     User? user = await _getCurrentUser();
     if (user != null) {
-      DocumentReference userRef = FirebaseFirestore.instance.collection('usuarios').doc(user.email);
+      DocumentReference userRef =
+          FirebaseFirestore.instance.collection('usuarios').doc(user.email);
 
       await userRef.update({
         'favoritos': FieldValue.arrayUnion([foodItem]),
@@ -94,10 +106,12 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
     // Verifica si estamos en la última página
     if (currentPageIndex == itemCount - 1) {
       // Si estamos en la última página, volvemos a la primera página
-      _pageController.animateToPage(0, duration: Duration(milliseconds: 300), curve: Curves.ease);
+      _pageController.animateToPage(0,
+          duration: Duration(milliseconds: 300), curve: Curves.ease);
     } else {
       // Si no estamos en la última página, avanzamos a la siguiente página
-      _pageController.nextPage(duration: Duration(milliseconds: 300), curve: Curves.ease);
+      _pageController.nextPage(
+          duration: Duration(milliseconds: 300), curve: Curves.ease);
     }
   }
 
@@ -115,15 +129,14 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
           Expanded(
             flex: 1,
             child: TabSection(
-              hamburguesas: hamburguesas,
-              bebidas: bebidas,
-              snacks: snacks,
-              postres: postres,
-              tabController: _tabController,
-              pageController: _pageController,
-              selectedLabel: selectedLabel,
-              filtrar:filtrar
-            ),
+                hamburguesas: hamburguesas,
+                bebidas: bebidas,
+                snacks: snacks,
+                postres: postres,
+                tabController: _tabController,
+                pageController: _pageController,
+                selectedLabel: selectedLabel,
+                filtrar: filtrar),
           ),
           SizedBox(height: MediaQuery.of(context).size.height * 0.01),
           Buttons(
@@ -131,8 +144,11 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
               int currentPageIndex = _pageController.page?.round() ?? 0;
               int itemCount = _pageController.positions.isNotEmpty
                   ? _pageController.positions.first.viewportDimension != null
-                  ? _pageController.positions.first.maxScrollExtent ~/ _pageController.positions.first.viewportDimension + 1
-                  : 0
+                      ? _pageController.positions.first.maxScrollExtent ~/
+                              _pageController
+                                  .positions.first.viewportDimension +
+                          1
+                      : 0
                   : 0;
               _nextPage(itemCount, currentPageIndex);
             },
@@ -143,11 +159,20 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
               switch (_tabController.index) {
                 case 0:
                   List<Map<String, dynamic>> filteredWithLabel = _filterAndSort(
-                    hamburguesas.where((hamburguesa) => hamburguesa['etiquetaSeleccionada'] == selectedLabel).toList(),
+                    hamburguesas
+                        .where((hamburguesa) =>
+                            hamburguesa['etiquetaSeleccionada'] ==
+                            selectedLabel)
+                        .toList(),
                     filtrar,
                   );
-                  List<Map<String, dynamic>> filteredWithoutLabel = _filterAndSort(
-                    hamburguesas.where((hamburguesa) => hamburguesa['etiquetaSeleccionada'] != selectedLabel).toList(),
+                  List<Map<String, dynamic>> filteredWithoutLabel =
+                      _filterAndSort(
+                    hamburguesas
+                        .where((hamburguesa) =>
+                            hamburguesa['etiquetaSeleccionada'] !=
+                            selectedLabel)
+                        .toList(),
                     filtrar,
                   );
                   currentList = filteredWithLabel + filteredWithoutLabel;
@@ -166,14 +191,14 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
                   currentList = [];
               }
               if (currentPageIndex < currentList.length) {
-                Map<String, dynamic> currentItem = currentList[currentPageIndex];
+                Map<String, dynamic> currentItem =
+                    currentList[currentPageIndex];
                 _addToFavorites(currentItem);
                 int itemCount = currentList.length;
                 _nextPage(itemCount, currentPageIndex);
               }
             },
           ),
-
           SizedBox(height: MediaQuery.of(context).size.height * 0.03),
           Footer(),
         ],
@@ -188,7 +213,8 @@ class PhraseAndTexts extends StatelessWidget {
     return Column(
       children: [
         Container(
-          padding: EdgeInsets.symmetric(vertical: MediaQuery.of(context).size.height * 0.01),
+          padding: EdgeInsets.symmetric(
+              vertical: MediaQuery.of(context).size.height * 0.01),
           color: Color.fromRGBO(255, 169, 209, 1.0),
           child: Text(
             'Ready to find love tonight?',
@@ -232,11 +258,14 @@ class PhraseAndTexts extends StatelessWidget {
 class Buttons extends StatelessWidget {
   final VoidCallback nextPage;
   final VoidCallback onFavorite;
-  const Buttons({Key? key, required this.nextPage,required this.onFavorite}) : super(key: key);
+  const Buttons({Key? key, required this.nextPage, required this.onFavorite})
+      : super(key: key);
 
   @override
   Widget build(BuildContext context) {
-    double buttonSize = MediaQuery.of(context).size.width <= 600 ? MediaQuery.of(context).size.width * 0.12 : 50.0;
+    double buttonSize = MediaQuery.of(context).size.width <= 600
+        ? MediaQuery.of(context).size.width * 0.12
+        : 50.0;
 
     return Column(
       children: [
@@ -246,25 +275,34 @@ class Buttons extends StatelessWidget {
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               Container(
-                margin: EdgeInsets.only(right: MediaQuery.of(context).size.width * 0.30),
+                margin: EdgeInsets.only(
+                    right: MediaQuery.of(context).size.width * 0.30),
                 width: buttonSize,
                 height: buttonSize,
-                decoration: BoxDecoration(color: Colors.purple, shape: BoxShape.circle,),
+                decoration: BoxDecoration(
+                  color: Colors.purple,
+                  shape: BoxShape.circle,
+                ),
                 child: IconButton(
                   iconSize: buttonSize * 0.6,
                   icon: Icon(Icons.close, color: Colors.white),
-                  onPressed: nextPage, // Movemos la página al hacer clic en el botón "X"
+                  onPressed:
+                      nextPage, // Movemos la página al hacer clic en el botón "X"
                 ),
               ),
               SizedBox(width: MediaQuery.of(context).size.width * 0.05),
               Container(
                 width: buttonSize,
                 height: buttonSize,
-                decoration: BoxDecoration(color: Colors.red, shape: BoxShape.circle,),
+                decoration: BoxDecoration(
+                  color: Colors.red,
+                  shape: BoxShape.circle,
+                ),
                 child: IconButton(
                   iconSize: buttonSize * 0.6,
                   icon: Icon(Icons.favorite, color: Colors.white),
-                  onPressed: onFavorite,  // Función del botón de "Favorito" sin asignar
+                  onPressed:
+                      onFavorite, // Función del botón de "Favorito" sin asignar
                 ),
               ),
             ],
@@ -285,38 +323,41 @@ class TabSection extends StatelessWidget {
   final String selectedLabel;
   final List<String> filtrar;
 
-
-
-  const TabSection({
-    Key? key,
-    required this.hamburguesas,
-    required this.bebidas,
-    required this.snacks,
-    required this.postres,
-    required this.tabController,
-    required this.pageController,
-    required this.selectedLabel,
-    required this.filtrar
-  }) : super(key: key);
+  const TabSection(
+      {Key? key,
+      required this.hamburguesas,
+      required this.bebidas,
+      required this.snacks,
+      required this.postres,
+      required this.tabController,
+      required this.pageController,
+      required this.selectedLabel,
+      required this.filtrar})
+      : super(key: key);
 
   @override
   Widget build(BuildContext context) {
-
     List<Map<String, dynamic>> filteredHamburguesas = _filterAndSort(
-        hamburguesas.where((hamburguesa) => hamburguesa['etiquetaSeleccionada'] == selectedLabel).toList(),
-        filtrar
-    );
+        hamburguesas
+            .where((hamburguesa) =>
+                hamburguesa['etiquetaSeleccionada'] == selectedLabel)
+            .toList(),
+        filtrar);
     List<Map<String, dynamic>> filteredHamburguesas2 = _filterAndSort(
-        hamburguesas.where((hamburguesa) => hamburguesa['etiquetaSeleccionada'] != selectedLabel).toList(),
-        filtrar
-    );
+        hamburguesas
+            .where((hamburguesa) =>
+                hamburguesa['etiquetaSeleccionada'] != selectedLabel)
+            .toList(),
+        filtrar);
 
-    List<Map<String, dynamic>> filteredBebidas = _filterAndSort(bebidas, filtrar);
-   // List<Map<String, dynamic>> remainingBebidas = bebidas.where((bebida) => bebida['etiqueta'] != filtrar).toList();
+    List<Map<String, dynamic>> filteredBebidas =
+        _filterAndSort(bebidas, filtrar);
+    // List<Map<String, dynamic>> remainingBebidas = bebidas.where((bebida) => bebida['etiqueta'] != filtrar).toList();
     List<Map<String, dynamic>> filteredSnacks = _filterAndSort(snacks, filtrar);
-   // List<Map<String, dynamic>> remainingSnacks = snacks.where((snack) => snack['etiqueta'] != filtrar).toList();
-    List<Map<String, dynamic>> filteredPostres = _filterAndSort(postres, filtrar);
-   // List<Map<String, dynamic>> remainingPostres = postres.where((postre) => postre['etiqueta'] != filtrar).toList();
+    // List<Map<String, dynamic>> remainingSnacks = snacks.where((snack) => snack['etiqueta'] != filtrar).toList();
+    List<Map<String, dynamic>> filteredPostres =
+        _filterAndSort(postres, filtrar);
+    // List<Map<String, dynamic>> remainingPostres = postres.where((postre) => postre['etiqueta'] != filtrar).toList();
     return Column(
       children: [
         TabBar(
@@ -329,7 +370,8 @@ class TabSection extends StatelessWidget {
                 'Food',
                 style: TextStyle(
                   fontSize: 17.0, // Modifica el tamaño de la letra aquí
-                  fontWeight: FontWeight.bold, // Aquí aplicas la propiedad fontWeight
+                  fontWeight:
+                      FontWeight.bold, // Aquí aplicas la propiedad fontWeight
                 ),
               ),
             ),
@@ -338,7 +380,8 @@ class TabSection extends StatelessWidget {
                 'Drink',
                 style: TextStyle(
                   fontSize: 17.0, // Modifica el tamaño de la letra aquí
-                  fontWeight: FontWeight.bold, // Aquí aplicas la propiedad fontWeight
+                  fontWeight:
+                      FontWeight.bold, // Aquí aplicas la propiedad fontWeight
                 ),
               ),
             ),
@@ -347,7 +390,8 @@ class TabSection extends StatelessWidget {
                 'Snack',
                 style: TextStyle(
                   fontSize: 17.0, // Modifica el tamaño de la letra aquí
-                  fontWeight: FontWeight.bold, // Aquí aplicas la propiedad fontWeight
+                  fontWeight:
+                      FontWeight.bold, // Aquí aplicas la propiedad fontWeight
                 ),
               ),
             ),
@@ -356,7 +400,8 @@ class TabSection extends StatelessWidget {
                 'Dessert',
                 style: TextStyle(
                   fontSize: 17.0, // Modifica el tamaño de la letra aquí
-                  fontWeight: FontWeight.bold, // Aquí aplicas la propiedad fontWeight
+                  fontWeight:
+                      FontWeight.bold, // Aquí aplicas la propiedad fontWeight
                 ),
               ),
             ),
@@ -367,10 +412,15 @@ class TabSection extends StatelessWidget {
           child: TabBarView(
             controller: tabController,
             children: [
-              ImageSection(foodList:  filteredHamburguesas + filteredHamburguesas2, pageController: pageController),
-              ImageSection(foodList: filteredBebidas , pageController: pageController),
-              ImageSection(foodList:  filteredSnacks  , pageController: pageController),
-              ImageSection(foodList: filteredPostres  , pageController: pageController),
+              ImageSection(
+                  foodList: filteredHamburguesas + filteredHamburguesas2,
+                  pageController: pageController),
+              ImageSection(
+                  foodList: filteredBebidas, pageController: pageController),
+              ImageSection(
+                  foodList: filteredSnacks, pageController: pageController),
+              ImageSection(
+                  foodList: filteredPostres, pageController: pageController),
             ],
           ),
         ),
@@ -378,30 +428,41 @@ class TabSection extends StatelessWidget {
     );
   }
 }
-List<Map<String, dynamic>> _filterAndSort(List<Map<String, dynamic>> items, List<String> selectedTags) {
+
+List<Map<String, dynamic>> _filterAndSort(
+    List<Map<String, dynamic>> items, List<String> selectedTags) {
   // Filtrar los elementos según las etiquetas seleccionadas por el usuario
-  List<Map<String, dynamic>> filteredItems = items.where((item) => item['etiqueta'].any((tag) => selectedTags.contains(tag))).toList();
+  List<Map<String, dynamic>> filteredItems = items
+      .where(
+          (item) => item['etiqueta'].any((tag) => selectedTags.contains(tag)))
+      .toList();
 
   // Ordenar los elementos según el número de etiquetas coincidentes
   filteredItems.sort((a, b) {
-    int scoreA = a['etiqueta'].where((tag) => selectedTags.contains(tag)).length;
-    int scoreB = b['etiqueta'].where((tag) => selectedTags.contains(tag)).length;
+    int scoreA =
+        a['etiqueta'].where((tag) => selectedTags.contains(tag)).length;
+    int scoreB =
+        b['etiqueta'].where((tag) => selectedTags.contains(tag)).length;
     return scoreB.compareTo(scoreA); // Ordenar de mayor a menor
   });
 
   // Agregar los elementos que no tienen etiquetas coincidentes
-  List<Map<String, dynamic>> unrelatedItems = items.where((item) => !item['etiqueta'].any((tag) => selectedTags.contains(tag))).toList();
+  List<Map<String, dynamic>> unrelatedItems = items
+      .where(
+          (item) => !item['etiqueta'].any((tag) => selectedTags.contains(tag)))
+      .toList();
   filteredItems.addAll(unrelatedItems);
 
   return filteredItems;
 }
 
-
 class ImageSection extends StatelessWidget {
   final List<Map<String, dynamic>> foodList;
   final PageController pageController;
 
-  const ImageSection({Key? key, required this.foodList, required this.pageController}) : super(key: key);
+  const ImageSection(
+      {Key? key, required this.foodList, required this.pageController})
+      : super(key: key);
   @override
   Widget build(BuildContext context) {
     return PageView.builder(
@@ -432,7 +493,8 @@ Future<User?> _getCurrentUser() async {
 
 Widget _buildUsernameWidget(BuildContext context, User user) {
   return FutureBuilder<DocumentSnapshot>(
-    future: FirebaseFirestore.instance.collection('usuarios').doc(user.email).get(),
+    future:
+        FirebaseFirestore.instance.collection('usuarios').doc(user.email).get(),
     builder: (BuildContext context, AsyncSnapshot<DocumentSnapshot> snapshot) {
       if (snapshot.connectionState == ConnectionState.waiting) {
         return CircularProgressIndicator();
@@ -443,14 +505,17 @@ Widget _buildUsernameWidget(BuildContext context, User user) {
           var userData = snapshot.data!.data() as Map<String, dynamic>;
           var username = userData['nombre'];
           var puntos = userData['puntos'] ?? 0;
-          var maxPuntos = 1000; // Aquí puedes establecer el máximo de puntos posible
+          var maxPuntos =
+              1000; // Aquí puedes establecer el máximo de puntos posible
           var progress = puntos / maxPuntos;
 
           return Container(
-            margin: EdgeInsets.symmetric(horizontal: MediaQuery.of(context).size.width * 0.12),
+            margin: EdgeInsets.symmetric(
+                horizontal: MediaQuery.of(context).size.width * 0.12),
             decoration: BoxDecoration(
               color: Colors.white, // Color de fondo blanco
-              borderRadius: BorderRadius.circular(20), // Bordes redondeados del contenedor
+              borderRadius: BorderRadius.circular(
+                  20), // Bordes redondeados del contenedor
             ),
             padding: EdgeInsets.all(MediaQuery.of(context).size.width * 0.01),
             child: Column(
@@ -459,7 +524,7 @@ Widget _buildUsernameWidget(BuildContext context, User user) {
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     Text(
-                       username ?? 'Nombre de Usuario no disponible',
+                      username ?? 'Nombre de Usuario no disponible',
                       textAlign: TextAlign.center,
                       style: TextStyle(
                         fontSize: MediaQuery.of(context).size.width * 0.05,
@@ -472,13 +537,17 @@ Widget _buildUsernameWidget(BuildContext context, User user) {
                       alignment: Alignment.center,
                       children: [
                         SizedBox(
-                          height: MediaQuery.of(context).size.width * 0.09, // Tamaño del gráfico circular (alto)
-                          width: MediaQuery.of(context).size.width * 0.09, // Tamaño del gráfico circular (ancho)
+                          height: MediaQuery.of(context).size.width *
+                              0.09, // Tamaño del gráfico circular (alto)
+                          width: MediaQuery.of(context).size.width *
+                              0.09, // Tamaño del gráfico circular (ancho)
                           child: CircularProgressIndicator(
                             value: progress,
-                            strokeWidth: MediaQuery.of(context).size.width * 0.016  , // Grosor del círculo
-                            valueColor: AlwaysStoppedAnimation<Color>(Colors.red), // Cambia el color a rojo
-                            backgroundColor:Color.fromRGBO(255, 169, 209, 1),
+                            strokeWidth: MediaQuery.of(context).size.width *
+                                0.016, // Grosor del círculo
+                            valueColor: AlwaysStoppedAnimation<Color>(
+                                Colors.red), // Cambia el color a rojo
+                            backgroundColor: Color.fromRGBO(255, 169, 209, 1),
                           ),
                         ),
                         Text(
@@ -519,5 +588,3 @@ Widget _buildUsernameWidget(BuildContext context, User user) {
     },
   );
 }
-
-

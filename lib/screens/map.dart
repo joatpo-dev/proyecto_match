@@ -5,7 +5,6 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import '../components/footer.dart';
 import '../components/header.dart';
-import 'home_screen.dart';
 
 void main() {
   runApp(MyApp());
@@ -30,7 +29,6 @@ class _StorePageState extends State<StorePage> {
   final List<LatLng> goikoLocations = [
     LatLng(41.3835, 2.1764), // Goiko Diagonal
   ];
-  final LatLng _defaultPosition = LatLng(41.3851, 2.1734);
   bool reservaExitosa = false;
   bool ubicacionSeleccionada = false;
 
@@ -65,10 +63,7 @@ class _StorePageState extends State<StorePage> {
       bottomNavigationBar: Footer(),
       body: Column(
         children: [
-          Container(
-            height: 60,
-            child: Header(),
-          ),
+          Header(),
           Expanded(
             child: Container(
               color: Color.fromRGBO(255, 169, 209, 1),
@@ -101,7 +96,7 @@ class _StorePageState extends State<StorePage> {
                         borderRadius: BorderRadius.circular(15),
                         boxShadow: [
                           BoxShadow(
-                            color: Colors.pink.withOpacity(0.4),
+                            color: Colors.pink.shade100,
                             blurRadius: 10,
                             offset: Offset(0, 5),
                           ),
@@ -110,64 +105,59 @@ class _StorePageState extends State<StorePage> {
                       child: ClipRRect(
                         borderRadius: BorderRadius.circular(15),
                         child: FlutterMap(
-                          options: MapOptions(
-                            center: _defaultPosition,
-                            zoom: 14.0,
-                          ),
                           children: [
                             TileLayer(
                               urlTemplate:
-                              "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",
+                                  "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",
                               subdomains: ['a', 'b', 'c'],
                             ),
                             MarkerLayer(
                               markers: [
                                 ...goikoLocations.map((location) => Marker(
-                                  width: 80.0,
-                                  height: 80.0,
-                                  point: location,
-                                  builder: (ctx) => GestureDetector(
-                                    onTap: () {
-                                      setState(() {
-                                        _selectedLocation = location;
-                                        ubicacionSeleccionada = true;
-                                      });
-                                    },
-                                    child: Container(
-                                      width: 60,
-                                      height: 60,
-                                      decoration: BoxDecoration(
-                                        border: Border.all(
-                                          color: _selectedLocation ==
-                                              location
-                                              ? Colors.red
-                                              : Colors.pinkAccent,
-                                          width: 2,
-                                        ),
-                                        borderRadius:
-                                        BorderRadius.circular(50),
-                                        boxShadow: [
-                                          BoxShadow(
-                                            color:
-                                            Colors.pink.withOpacity(0.4),
-                                            blurRadius: 5,
-                                            offset: Offset(0, 3),
+                                      width: 80.0,
+                                      height: 80.0,
+                                      point: location,
+                                      child: GestureDetector(
+                                        onTap: () {
+                                          setState(() {
+                                            _selectedLocation = location;
+                                            ubicacionSeleccionada = true;
+                                          });
+                                        },
+                                        child: Container(
+                                          width: 60,
+                                          height: 60,
+                                          decoration: BoxDecoration(
+                                            border: Border.all(
+                                              color:
+                                                  _selectedLocation == location
+                                                      ? Colors.red
+                                                      : Colors.pinkAccent,
+                                              width: 2,
+                                            ),
+                                            borderRadius:
+                                                BorderRadius.circular(50),
+                                            boxShadow: [
+                                              BoxShadow(
+                                                color: Colors.pink.shade100,
+                                                blurRadius: 5,
+                                                offset: Offset(0, 3),
+                                              ),
+                                            ],
                                           ),
-                                        ],
-                                      ),
-                                      child: ClipRRect(
-                                        borderRadius:
-                                        BorderRadius.circular(15),
-                                        child: Image.asset(
-                                          'assets/match3.png',
-                                          width: 50,
-                                          height: 50,
-                                          fit: BoxFit.cover,
+                                          child: ClipRRect(
+                                            borderRadius:
+                                                BorderRadius.circular(15),
+                                            child: Image.asset(
+                                              'assets/match3.png',
+                                              width: 50,
+                                              height: 50,
+                                              fit: BoxFit.cover,
+                                            ),
+                                          ),
                                         ),
                                       ),
-                                    ),
-                                  ),
-                                )),
+                                    )),
                               ],
                             ),
                           ],
@@ -195,29 +185,31 @@ class _StorePageState extends State<StorePage> {
                           child: ElevatedButton(
                             onPressed: ubicacionSeleccionada
                                 ? () {
-                              if (reserva) {
-                                // Cancelar reserva
-                                FirebaseFirestore.instance
-                                    .collection('usuarios')
-                                    .doc(FirebaseAuth.instance.currentUser!.email)
-                                    .update({'reserva': false}).then((_) {
-                                  setState(() {
-                                    reservaExitosa = false;
-                                  });
-                                });
-                              } else {
-                                // Realizar reserva
-                                FirebaseFirestore.instance
-                                    .collection('usuarios')
-                                    .doc(FirebaseAuth.instance.currentUser!.email)
-                                    .update({'reserva': true}).then((_) {
-                                  setState(() {
-                                    reservaExitosa = true;
-                                  });
-                                  _showReservationDialog(context);
-                                });
-                              }
-                            }
+                                    if (reserva) {
+                                      // Cancelar reserva
+                                      FirebaseFirestore.instance
+                                          .collection('usuarios')
+                                          .doc(FirebaseAuth
+                                              .instance.currentUser!.email)
+                                          .update({'reserva': false}).then((_) {
+                                        setState(() {
+                                          reservaExitosa = false;
+                                        });
+                                      });
+                                    } else {
+                                      // Realizar reserva
+                                      FirebaseFirestore.instance
+                                          .collection('usuarios')
+                                          .doc(FirebaseAuth
+                                              .instance.currentUser!.email)
+                                          .update({'reserva': true}).then((_) {
+                                        setState(() {
+                                          reservaExitosa = true;
+                                        });
+                                        _showReservationDialog(context);
+                                      });
+                                    }
+                                  }
                                 : null,
                             child: Padding(
                               padding: const EdgeInsets.symmetric(
